@@ -5,7 +5,7 @@ namespace Tofunaut.TofuUnity
 {
     public static class GameObjectExtentions
     {
-        public static MonoBehaviour RequireComponent<T>(this GameObject go) where T : MonoBehaviour
+        public static T RequireComponent<T>(this GameObject go) where T : MonoBehaviour
         {
             T toReturn = go.GetComponent<T>();
             if (toReturn == null)
@@ -14,6 +14,16 @@ namespace Tofunaut.TofuUnity
             }
 
             return toReturn;
+        }
+
+        public static TofuAnimator.Sequence Sequence(this GameObject go)
+        {
+            return new TofuAnimator.Sequence(go);
+        }
+
+        public static void PlaySequence(this GameObject go, TofuAnimator.Sequence sequence)
+        {
+            TofuAnimator.Play(go, sequence);
         }
     }
 }

@@ -191,37 +191,28 @@ namespace Tofunaut.TofuUnity
                     break;
             }
 
-            return (float v) => (proxyCallback(0, 1, v));
+            return (float v) => proxyCallback(0, 1, v);
         }
 
-        private static TofuAnimator _instance;
+        public static int NumSequencesPlaying { get; private set; }
 
         public delegate void ValueCallback(float percent);
         public delegate float CurveCallback(float percent);
 
-
-        private HashSet<Sequence> _activeSequences;
-        private HashSet<Sequence> _toAdd = new HashSet<Sequence>();
+        private List<Sequence> _activeSequences;
+        private List<Sequence> _toAdd = new List<Sequence>();
 
         private void Awake()
         {
-            if (_instance != null)
-            {
-                Debug.LogError("An instance of TofuAnimator already exists");
-                Destroy(this);
-                return;
-            }
-
-            _activeSequences = new HashSet<Sequence>();
-            _toAdd = new HashSet<Sequence>();
-
-            DontDestroyOnLoad(this);
+            _activeSequences = new List<Sequence>();
+            _toAdd = new List<Sequence>();
         }
 
         private void Update()
         {
             foreach (Sequence toAdd in _toAdd)
             {
+                NumSequencesPlaying++;
                 _activeSequences.Add(toAdd);
             }
             _toAdd.Clear();
@@ -238,18 +229,15 @@ namespace Tofunaut.TofuUnity
 
             foreach (Sequence completeSequence in toRemove)
             {
+                NumSequencesPlaying--;
                 _activeSequences.Remove(completeSequence);
             }
         }
 
-        public static void Play(TofuAnimator.Sequence sequence)
+        public static void Play(GameObject gameObject, Sequence sequence)
         {
-            if (!_instance)
-            {
-                _instance = new GameObject("TofuAnimator", new[] { typeof(TofuAnimator) }).GetComponent<TofuAnimator>();
-            }
-
-            _instance._toAdd.Add(sequence);
+            TofuAnimator tofuAnimator = gameObject.RequireComponent<TofuAnimator>();
+            tofuAnimator._toAdd.Add(sequence);
         }
 
         public class Sequence
@@ -258,9 +246,11 @@ namespace Tofunaut.TofuUnity
 
             private Queue<List<Clip>> _clipSequence;
             private List<Clip> _toEnqueue;
+            private readonly GameObject _target;
 
-            public Sequence()
+            public Sequence(GameObject target)
             {
+                _target = target;
                 _clipSequence = new Queue<List<Clip>>();
                 _toEnqueue = new List<Clip>();
             }
@@ -314,7 +304,7 @@ namespace Tofunaut.TofuUnity
             public void Play()
             {
                 Then();
-                TofuAnimator.Play(this);
+                _target.PlaySequence(this);
             }
 
             public bool Update(float deltaTime)
@@ -739,7 +729,7 @@ namespace Tofunaut.TofuUnity
 
             return a * Mathf.Pow(2, -10 * (value -= 1)) * Mathf.Sin((value * d - s) * (2 * Mathf.PI) / p) * 0.5f + end + start;
         }
-    }
 
-    #endregion
+        #endregion
+    }
 }
