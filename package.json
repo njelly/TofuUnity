@@ -1,0 +1,8 @@
+{
+    "name": "com.tofunaut.tofuunity",
+    "displayName": "TofuUnity",
+    "version": "1.0.0",
+    "unity": "2019.3",
+    "description": "A collection of utility scripts for Unity",
+    "dependencies": { }
+  }
