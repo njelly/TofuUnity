@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Tofunaut.TofuUnity.Samples
 {
@@ -13,6 +11,19 @@ namespace Tofunaut.TofuUnity.Samples
             // iterate through each to create a transition between each permutation
             foreach (MonoBehaviour from in _states)
             {
+                // register the null to current state transition
+                RegisterTransition(string.Empty, from.name, () =>
+                {
+                    Vector3 startPos = stateTransitionRepresentation.transform.position;
+                    Vector3 endPos = from.transform.position;
+                    stateTransitionRepresentation.Sequence()
+                        .Curve(TofuAnimator.EEaseType.EaseOutExpo, 1f, (float percent) =>
+                        {
+                            stateTransitionRepresentation.transform.position = Vector3.LerpUnclamped(startPos, endPos, percent);
+                        })
+                        .Play();
+                });
+
                 foreach (MonoBehaviour to in _states)
                 {
                     Vector3 startPos = from.transform.position;

@@ -6,7 +6,7 @@ namespace Tofunaut.TofuUnity
 {
     public class TofuStateMachine : MonoBehaviour
     {
-        private static Action _defaultTransition = () => { };
+        private static Action _DefaultTransition = () => { };
 
         // _states that should be registered when this GameObject is instantiated, don't modify in code
         // allows states to be set up in the inspector
@@ -35,6 +35,7 @@ namespace Tofunaut.TofuUnity
             if (!mb)
             {
                 mb = new GameObject(nameof(T), new Type[] { typeof(T) }).GetComponent<T>();
+                mb.transform.SetParent(transform);
             }
 
             RegisterState(mb);
@@ -52,6 +53,9 @@ namespace Tofunaut.TofuUnity
             _typeToState.Add(state.GetType(), state);
 
             state.gameObject.SetActive(false);
+
+            // register transition from null state to this state by default with the no-op transition
+            RegisterTransition(string.Empty, state.name, _DefaultTransition);
         }
 
         public void RegisterTransition<T1, T2>(Action onTransition = null)
@@ -70,6 +74,12 @@ namespace Tofunaut.TofuUnity
 
         public void RegisterTransition(string from, string to, Action onTransition = null)
         {
+            if (string.IsNullOrEmpty(to))
+            {
+                Debug.LogError("cannot transition to a null state");
+                return;
+            }
+
             if (!_fromToAction.TryGetValue(from, out Dictionary<string, Action> toAction))
             {
                 toAction = new Dictionary<string, Action>();
@@ -91,18 +101,19 @@ namespace Tofunaut.TofuUnity
                 // disable the current state
                 MonoBehaviour mb = _keyToState[_currentState];
                 mb.gameObject.SetActive(false);
+            }
 
-                // if the current state has been set, verify we've registered a transition
-                if (_fromToAction.TryGetValue(_currentState, out Dictionary<string, Action> toAction))
-                {
-                    // invoke the transition callback while both states are disabled
-                    toAction[key]?.Invoke();
-                }
-                else
-                {
-                    Debug.LogError($"the transition from {_currentState} to {key} has not been registered");
-                    return;
-                }
+            // do this check outside of the isNullOrEmpty check to allow for transitions from null state to a new state
+            // if the current state has been set, verify we've registered a transition
+            if (_fromToAction.TryGetValue(_currentState, out Dictionary<string, Action> toAction))
+            {
+                // invoke the transition callback while both states are disabled
+                toAction[key]?.Invoke();
+            }
+            else
+            {
+                Debug.LogError($"the transition from {_currentState} to {key} has not been registered");
+                return;
             }
 
             if (_keyToState.TryGetValue(key, out MonoBehaviour newState))
