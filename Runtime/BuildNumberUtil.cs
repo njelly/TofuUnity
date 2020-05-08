@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-namespace Tofunaut.UnityUtils
+namespace Tofunaut.TofuUnity
 {
     public static class BuildNumberUtil
     {

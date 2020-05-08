@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace Tofunaut.UnityUtils
+namespace Tofunaut.TofuUnity
 {
     public static class BuildNumberIncrementer
     {
