@@ -12,6 +12,8 @@ namespace Tofunaut.TofuUnity
         // allows states to be set up in the inspector
         [SerializeField] protected List<MonoBehaviour> _states;
 
+        public string CurrentState => _currentState;
+
         private Dictionary<string, MonoBehaviour> _keyToState;
         private Dictionary<string, Dictionary<string, Action>> _fromToAction;
         private Dictionary<Type, MonoBehaviour> _typeToState;

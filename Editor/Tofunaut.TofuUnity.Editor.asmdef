@@ -1,0 +1,15 @@
+{
+    "name": "Tofunaut.TofuUnity.Editor",
+    "references": [
+        "GUID:208352e8cba3f5f47923630adb2616ab"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

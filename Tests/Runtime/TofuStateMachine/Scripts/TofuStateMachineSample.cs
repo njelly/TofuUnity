@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace Tofunaut.TofuUnity.Samples
 {
     public class TofuStateMachineSample : TofuStateMachine
     {
         public GameObject stateTransitionRepresentation;
+        public Text currentStateLabel;
 
         private void Start()
         {
@@ -41,6 +43,11 @@ namespace Tofunaut.TofuUnity.Samples
                     });
                 }
             }
+        }
+
+        private void Update()
+        {
+            currentStateLabel.text = CurrentState;
         }
 
         public void GoToStateA()

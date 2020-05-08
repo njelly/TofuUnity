@@ -9,7 +9,7 @@ namespace Tofunaut.TofuUnity.Samples
             Debug.Log("Entered State B!");
         }
 
-        private void OnDisabe()
+        private void OnDisable()
         {
             Debug.Log("Exited State B ..");
         }
