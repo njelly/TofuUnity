@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace Tofunaut.UnityUtils
+namespace Tofunaut.TofuUnity
 {
     public class AssetManager
     {
