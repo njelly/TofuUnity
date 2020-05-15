@@ -91,18 +91,19 @@ namespace Tofunaut.TofuUnity
             toAction[to] = onTransition;
         }
 
-        public void TransitionTo<T>() where T : MonoBehaviour
+        public T TransitionTo<T>() where T : MonoBehaviour
         {
-            TransitionTo(_typeToState[typeof(T)].name);
+            return TransitionTo(_typeToState[typeof(T)].name) as T;
         }
 
-        public void TransitionTo(string key)
+        public MonoBehaviour TransitionTo(string key)
         {
+            MonoBehaviour currentStateBehaviour = null;
             if (!string.IsNullOrEmpty(_currentState))
             {
                 // disable the current state
-                MonoBehaviour mb = _keyToState[_currentState];
-                mb.gameObject.SetActive(false);
+                currentStateBehaviour = _keyToState[_currentState];
+                currentStateBehaviour.gameObject.SetActive(false);
             }
 
             // do this check outside of the isNullOrEmpty check to allow for transitions from null state to a new state
@@ -112,22 +113,19 @@ namespace Tofunaut.TofuUnity
                 // invoke the transition callback while both states are disabled
                 toAction[key]?.Invoke();
             }
-            else
-            {
-                Debug.LogError($"the transition from {_currentState} to {key} has not been registered");
-                return;
-            }
 
-            if (_keyToState.TryGetValue(key, out MonoBehaviour newState))
+            if (_keyToState.TryGetValue(key, out currentStateBehaviour))
             {
                 // enable the next state
-                _currentState = newState.name;
-                newState.gameObject.SetActive(true);
+                _currentState = currentStateBehaviour.name;
+                currentStateBehaviour.gameObject.SetActive(true);
             }
             else
             {
                 Debug.LogError($"the state {key} has not been registered, it cannot be transitioned to");
             }
+
+            return currentStateBehaviour;
         }
     }
 }
