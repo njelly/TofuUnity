@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5142fb6a11f06834495f5d358e5b20e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bounceEvent: {fileID: 11400000, guid: ea89994ad7e404424988a9bf2bd3939f, type: 2}
 --- !u!33 &7965882938197042355
 MeshFilter:
   m_ObjectHideFlags: 0
