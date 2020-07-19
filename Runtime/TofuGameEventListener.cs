@@ -6,7 +6,7 @@ namespace Tofunaut.TofuUnity
 {
     public sealed class TofuGameEventListener : MonoBehaviour
     {
-        [SerializeField] private TofuGameEvent[] _gameEvents;
+        [SerializeField] private TofuGameEvent[] _gameEvents = new TofuGameEvent[0];
 
         public UnityEvent response;
 

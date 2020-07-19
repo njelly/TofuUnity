@@ -13,7 +13,6 @@ namespace Tofunaut.TofuUnity.Samples
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            Debug.Log("raise");
             bounceEvent.Raise();
         }
     }
