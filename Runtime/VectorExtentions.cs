@@ -2,25 +2,7 @@
 
 namespace Tofunaut.TofuUnity
 {
-    public enum ECardinalDirection4
-    {
-        East = 0,
-        North = 1,
-        West = 2,
-        South = 3
-    }
 
-    public enum ECardinalDirection8
-    {
-        East = 0,
-        NorthEast = 1,
-        North = 2,
-        NorthWest = 3,
-        West = 4,
-        SouthWest = 5,
-        South = 6,
-        SouthEast = 7
-    }
 
     public static class VectorExtentions
     {
