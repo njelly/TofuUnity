@@ -2,9 +2,9 @@
 
 namespace Tofunaut.TofuUnity.Samples.QuadTree
 {
+    [ExecuteInEditMode]
     public class QuadTreeEntity : MonoBehaviour, ICoordinate
     {
-        private Vector2IntQuadTree<QuadTreeEntity> _quadTree;
         private Vector2Int _prevCoord = new Vector2Int(int.MinValue, int.MinValue);
 
         private void Update()
@@ -20,7 +20,14 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
 
         public Vector2Int GetCoordinate()
         {
-            return new Vector2Int(Mathf.FloorToInt(gameObject.transform.position.x), Mathf.FloorToInt(gameObject.transform.position.y));
+            return new Vector2Int(Mathf.CeilToInt(gameObject.transform.position.x), Mathf.CeilToInt(gameObject.transform.position.y));
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            UnityEditor.Handles.Label(transform.position, $"{_prevCoord}");
+        }
+#endif
     }
 }

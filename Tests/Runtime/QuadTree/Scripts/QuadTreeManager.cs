@@ -30,8 +30,8 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
 
         private void RenderQuadTree<T>(Vector2IntQuadTree<T> tree) where T : ICoordinate
         {
-            Gizmos.DrawLine(new Vector2(tree.Min.x, tree.Min.y), new Vector2(tree.Min.x, tree.Max.y));
             Gizmos.DrawLine(new Vector2(tree.Min.x, tree.Max.y), new Vector2(tree.Max.x, tree.Max.y));
+            Gizmos.DrawLine(new Vector2(tree.Max.x, tree.Max.y), new Vector2(tree.Max.x, tree.Min.y));
 
             if (tree.Quadrants != null)
             {
@@ -47,11 +47,21 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
 
         public static void Add(QuadTreeEntity e)
         {
+            if (!_instance)
+            {
+                return;
+            }
+
             _instance._quadTree.Add(e);
         }
 
         public static bool Remove(QuadTreeEntity e)
         {
+            if (!_instance)
+            {
+                return false;
+            }
+
             return _instance._quadTree.Remove(e);
         }
 
