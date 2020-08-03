@@ -143,11 +143,17 @@ namespace Tofunaut.TofuUnity
 
             if (Quadrants == null)
             {
-                toReturn = new List<T>();
+                toReturn = null;
                 return false;
             }
 
             return Quadrants[index].TryGet(coord, out toReturn);
+        }
+
+        public void Clear()
+        {
+            _objects.Clear();
+            Quadrants = null;
         }
 
         private int GetQuadrantIndexFor(Vector2Int coord)
