@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Tofunaut.TofuUnity.Samples.QuadTree
+namespace Tofunaut.TofuUnity
 {
     public class Vector2IntQuadTree<T>
     {
