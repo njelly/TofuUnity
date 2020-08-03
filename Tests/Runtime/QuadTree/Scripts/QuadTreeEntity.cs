@@ -12,9 +12,7 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             Vector2Int coord = GetCoordinate();
             if (coord != _prevCoord)
             {
-                QuadTreeManager.Remove(this, _prevCoord);
-                QuadTreeManager.Add(this);
-
+                QuadTreeManager.Translate(this, _prevCoord, coord);
                 _prevCoord = coord;
             }
         }

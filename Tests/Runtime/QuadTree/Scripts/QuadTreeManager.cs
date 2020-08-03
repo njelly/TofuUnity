@@ -11,10 +11,7 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
         {
             base.Awake();
 
-            _quadTree = new Vector2IntQuadTree<QuadTreeEntity>(Vector2Int.one * -512, Vector2Int.one * 512, (QuadTreeEntity e) =>
-            {
-                return new Vector2Int(Mathf.CeilToInt(e.gameObject.transform.position.x), Mathf.CeilToInt(e.gameObject.transform.position.y));
-            });
+            _quadTree = new Vector2IntQuadTree<QuadTreeEntity>(Vector2Int.one * -512, Vector2Int.one * 512);
         }
 
         private void Update()
@@ -48,14 +45,14 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             }
         }
 
-        public static void Add(QuadTreeEntity e)
+        public static void Add(QuadTreeEntity e, Vector2Int coord)
         {
             if (!_instance)
             {
                 return;
             }
 
-            _instance._quadTree.Add(e);
+            _instance._quadTree.Add(e, coord);
         }
 
         public static bool Remove(QuadTreeEntity e, Vector2Int coord)
@@ -68,13 +65,26 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             return _instance._quadTree.Remove(e, coord);
         }
 
+        public static void Translate(QuadTreeEntity e, Vector2Int from, Vector2Int to)
+        {
+            if (!_instance)
+            {
+                return;
+            }
+
+            _instance._quadTree.Translate(e, from, to);
+        }
+
         public int GetLayerMaskAt(Vector2Int coord)
         {
-            _instance._quadTree.TryGet(coord, out List<QuadTreeEntity> atCoord);
             int mask = 0;
-            foreach (QuadTreeEntity e in atCoord)
+
+            if (_instance._quadTree.TryGet(coord, out List<QuadTreeEntity> atCoord))
             {
-                mask |= e.gameObject.layer;
+                foreach (QuadTreeEntity e in atCoord)
+                {
+                    mask |= e.gameObject.layer;
+                }
             }
 
             return mask;

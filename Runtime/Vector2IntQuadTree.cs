@@ -6,8 +6,6 @@ namespace Tofunaut.TofuUnity
 {
     public class Vector2IntQuadTree<T>
     {
-        public delegate Vector2Int GetVector2IntFrom(T obj);
-
         public int Count { get; private set; }
         public Vector2IntQuadTree<T>[] Quadrants { get; private set; }
         public Vector2Int Pivot { get; private set; }
@@ -15,12 +13,10 @@ namespace Tofunaut.TofuUnity
         public Vector2Int Max { get; private set; }
         public int Depth { get; private set; }
 
-        private GetVector2IntFrom _getFrom;
         private List<T> _objects;
 
-        public Vector2IntQuadTree(Vector2Int min, Vector2Int max, GetVector2IntFrom getFrom)
+        public Vector2IntQuadTree(Vector2Int min, Vector2Int max)
         {
-            _getFrom = getFrom;
             _objects = new List<T>();
             Min = min;
             Max = max;
@@ -57,17 +53,7 @@ namespace Tofunaut.TofuUnity
             Depth = depth;
         }
 
-        public void Add(T obj)
-        {
-            Vector2Int coord = _getFrom(obj);
-            if (coord.x <= Min.x || coord.x > Max.x || coord.y <= Min.y || coord.y > Max.y)
-            {
-                throw new System.InvalidOperationException($"cannot remove object from quadtree, {coord} is out of bounds min: {Min}, max: {Max}, depth: {Depth}");
-            }
-
-            Add(obj, coord);
-        }
-        private void Add(T obj, Vector2Int coord)
+        public void Add(T obj, Vector2Int coord)
         {
             int index = GetQuadrantIndexFor(coord);
             if (index == -1)
@@ -91,21 +77,6 @@ namespace Tofunaut.TofuUnity
             Count++;
         }
 
-        public bool Remove(T obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            Vector2Int coord = _getFrom(obj);
-            if (coord.x <= Min.x || coord.x > Max.x || coord.y <= Min.y || coord.y > Max.y)
-            {
-                throw new System.InvalidOperationException($"cannot remove object from quadtree, {coord} is out of bounds min: {Min}, max: {Max}, depth: {Depth}");
-            }
-
-            return Remove(obj, coord);
-        }
         public bool Remove(T obj, Vector2Int coord)
         {
             int index = GetQuadrantIndexFor(coord);
@@ -148,6 +119,12 @@ namespace Tofunaut.TofuUnity
             }
 
             return Quadrants[index].TryGet(coord, out toReturn);
+        }
+
+        public void Translate(T obj, Vector2Int from, Vector2Int to)
+        {
+            Remove(obj, from);
+            Add(obj, to);
         }
 
         public void Clear()
