@@ -11,7 +11,10 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
         {
             base.Awake();
 
-            _quadTree = new Vector2IntQuadTree<QuadTreeEntity>(Vector2Int.one * -64, Vector2Int.one * 64);
+            _quadTree = new Vector2IntQuadTree<QuadTreeEntity>(Vector2Int.one * -512, Vector2Int.one * 512, (QuadTreeEntity e) =>
+            {
+                return new Vector2Int(Mathf.CeilToInt(e.gameObject.transform.position.x), Mathf.CeilToInt(e.gameObject.transform.position.y));
+            });
         }
 
         private void Update()
@@ -28,10 +31,10 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             }
         }
 
-        private void RenderQuadTree<T>(Vector2IntQuadTree<T> tree) where T : ICoordinate
+        private void RenderQuadTree<T>(Vector2IntQuadTree<T> tree)
         {
-            Gizmos.DrawLine(new Vector2(tree.Min.x, tree.Max.y), new Vector2(tree.Max.x, tree.Max.y));
-            Gizmos.DrawLine(new Vector2(tree.Max.x, tree.Max.y), new Vector2(tree.Max.x, tree.Min.y));
+            Debug.DrawLine(new Vector2(tree.Min.x, tree.Max.y), new Vector2(tree.Max.x, tree.Max.y), tree.Depth % 2 == 0 ? Color.red : Color.green);
+            Debug.DrawLine(new Vector2(tree.Max.x, tree.Max.y), new Vector2(tree.Max.x, tree.Min.y), tree.Depth % 2 == 0 ? Color.red : Color.green);
 
             if (tree.Quadrants != null)
             {
@@ -55,14 +58,14 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             _instance._quadTree.Add(e);
         }
 
-        public static bool Remove(QuadTreeEntity e)
+        public static bool Remove(QuadTreeEntity e, Vector2Int coord)
         {
             if (!_instance)
             {
                 return false;
             }
 
-            return _instance._quadTree.Remove(e);
+            return _instance._quadTree.Remove(e, coord);
         }
 
         public int GetLayerMaskAt(Vector2Int coord)

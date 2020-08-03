@@ -1,32 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tofunaut.TofuUnity.Samples.QuadTree
 {
-    public interface ICoordinate
+    public class Vector2IntQuadTree<T>
     {
-        Vector2Int GetCoordinate();
-    }
+        public delegate Vector2Int GetVector2IntFrom(T obj);
 
-    public class Vector2IntQuadTree<T> where T : ICoordinate
-    {
         public int Count { get; private set; }
-        public Vector2IntQuadTree<T>[] Quadrants => _quadrants;
+        public Vector2IntQuadTree<T>[] Quadrants { get; private set; }
         public Vector2Int Pivot { get; private set; }
         public Vector2Int Min { get; private set; }
         public Vector2Int Max { get; private set; }
+        public int Depth { get; private set; }
 
+        private GetVector2IntFrom _getFrom;
         private List<T> _objects;
-        private Vector2IntQuadTree<T>[] _quadrants;
-        private int _depth;
 
-        public Vector2IntQuadTree(Vector2Int min, Vector2Int max)
+        public Vector2IntQuadTree(Vector2Int min, Vector2Int max, GetVector2IntFrom getFrom)
         {
+            _getFrom = getFrom;
             _objects = new List<T>();
             Min = min;
             Max = max;
+
             Pivot = (Min + Max) / 2;
-            _depth = 0;
+            if (Math.Abs(Min.x - Max.x) <= 1)
+            {
+                Pivot = new Vector2Int(Min.x, Pivot.y);
+            }
+            if (Math.Abs(Min.y - Max.y) <= 1)
+            {
+                Pivot = new Vector2Int(Pivot.x, Min.y);
+            }
+
+            Depth = 0;
         }
 
         private Vector2IntQuadTree(Vector2Int min, Vector2Int max, int depth)
@@ -34,28 +43,32 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             _objects = new List<T>();
             Min = min;
             Max = max;
+
             Pivot = (Min + Max) / 2;
-            _depth = depth;
+            if (Math.Abs(Min.x - Max.x) <= 1)
+            {
+                Pivot = new Vector2Int(Min.x, Pivot.y);
+            }
+            if (Math.Abs(Min.y - Max.y) <= 1)
+            {
+                Pivot = new Vector2Int(Pivot.x, Min.y);
+            }
+
+            Depth = depth;
         }
 
         public void Add(T obj)
         {
-            Vector2Int coord = obj.GetCoordinate();
-            if (coord.x < Min.x || coord.x >= Max.x || coord.y < Min.y || coord.y >= Max.y)
+            Vector2Int coord = _getFrom(obj);
+            if (coord.x <= Min.x || coord.x > Max.x || coord.y <= Min.y || coord.y > Max.y)
             {
-                throw new System.InvalidOperationException($"cannot add object to quadtree, {coord} is out of bounds");
+                throw new System.InvalidOperationException($"cannot remove object from quadtree, {coord} is out of bounds min: {Min}, max: {Max}, depth: {Depth}");
             }
 
             Add(obj, coord);
         }
         private void Add(T obj, Vector2Int coord)
         {
-            if (_depth > 16)
-            {
-                Debug.Log($"ADD Depth is greater than 16, returning. min: {Min}, max: {Max}, pivot: {Pivot}");
-                return;
-            }
-
             int index = GetQuadrantIndexFor(coord);
             if (index == -1)
             {
@@ -63,17 +76,17 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             }
             else
             {
-                if (_quadrants == null)
+                if (Quadrants == null)
                 {
-                    _quadrants = new Vector2IntQuadTree<T>[]
+                    Quadrants = new Vector2IntQuadTree<T>[]
                     {
-                        new Vector2IntQuadTree<T>(Pivot, Max, _depth + 1),
-                        new Vector2IntQuadTree<T>(new Vector2Int(Pivot.x, Min.y), new Vector2Int(Max.x, Pivot.y), _depth + 1),
-                        new Vector2IntQuadTree<T>(Min, Pivot, _depth + 1),
-                        new Vector2IntQuadTree<T>(new Vector2Int(Min.x, Pivot.y), new Vector2Int(Pivot.x, Max.y), _depth + 1),
+                        new Vector2IntQuadTree<T>(Pivot, Max, Depth + 1),
+                        new Vector2IntQuadTree<T>(new Vector2Int(Pivot.x, Min.y), new Vector2Int(Max.x, Pivot.y), Depth + 1),
+                        new Vector2IntQuadTree<T>(Min, Pivot, Depth + 1),
+                        new Vector2IntQuadTree<T>(new Vector2Int(Min.x, Pivot.y), new Vector2Int(Pivot.x, Max.y), Depth + 1),
                     };
                 }
-                _quadrants[index].Add(obj, coord);
+                Quadrants[index].Add(obj, coord);
             }
             Count++;
         }
@@ -85,31 +98,25 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
                 return false;
             }
 
-            Vector2Int coord = obj.GetCoordinate();
-            if (coord.x < Min.x || coord.x >= Max.x || coord.y < Min.y || coord.y >= Max.y)
+            Vector2Int coord = _getFrom(obj);
+            if (coord.x <= Min.x || coord.x > Max.x || coord.y <= Min.y || coord.y > Max.y)
             {
-                throw new System.InvalidOperationException($"cannot remove object from quadtree, {coord} is out of bounds min: {Min}, max: {Max}, depth: {_depth}");
+                throw new System.InvalidOperationException($"cannot remove object from quadtree, {coord} is out of bounds min: {Min}, max: {Max}, depth: {Depth}");
             }
 
             return Remove(obj, coord);
         }
-        private bool Remove(T obj, Vector2Int coord)
+        public bool Remove(T obj, Vector2Int coord)
         {
-            if (_depth > 16)
-            {
-                Debug.Log("REMOVE Depth is greater than 16, returning");
-                return false;
-            }
-
             int index = GetQuadrantIndexFor(coord);
             bool didRemove = false;
             if (index == -1)
             {
                 didRemove |= _objects.Remove(obj);
             }
-            else if (_quadrants != null)
+            else if (Quadrants != null)
             {
-                didRemove |= _quadrants[index].Remove(obj, coord);
+                didRemove |= Quadrants[index].Remove(obj, coord);
             }
 
             if (didRemove)
@@ -119,7 +126,7 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
 
             if (Count <= 0)
             {
-                _quadrants = null;
+                Quadrants = null;
             }
 
             return didRemove;
@@ -134,18 +141,18 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
                 return toReturn.Count > 0;
             }
 
-            if (_quadrants == null)
+            if (Quadrants == null)
             {
                 toReturn = new List<T>();
                 return false;
             }
 
-            return _quadrants[index].TryGet(coord, out toReturn);
+            return Quadrants[index].TryGet(coord, out toReturn);
         }
 
         private int GetQuadrantIndexFor(Vector2Int coord)
         {
-            if (Pivot.x == coord.x && Pivot.y == coord.y)
+            if (Pivot == Min)
             {
                 return -1;
             }

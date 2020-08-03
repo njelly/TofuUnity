@@ -3,7 +3,7 @@
 namespace Tofunaut.TofuUnity.Samples.QuadTree
 {
     [ExecuteInEditMode]
-    public class QuadTreeEntity : MonoBehaviour, ICoordinate
+    public class QuadTreeEntity : MonoBehaviour
     {
         private Vector2Int _prevCoord = new Vector2Int(int.MinValue, int.MinValue);
 
@@ -12,8 +12,9 @@ namespace Tofunaut.TofuUnity.Samples.QuadTree
             Vector2Int coord = GetCoordinate();
             if (coord != _prevCoord)
             {
-                QuadTreeManager.Remove(this);
+                QuadTreeManager.Remove(this, _prevCoord);
                 QuadTreeManager.Add(this);
+
                 _prevCoord = coord;
             }
         }
