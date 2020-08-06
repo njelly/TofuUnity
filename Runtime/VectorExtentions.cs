@@ -2,9 +2,7 @@
 
 namespace Tofunaut.TofuUnity
 {
-
-
-    public static class VectorExtentions
+    public static class VectorExtensions
     {
         public static ECardinalDirection4 ToCardinalDirection4(this Vector2 v)
         {

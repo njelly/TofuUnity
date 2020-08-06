@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Tofunaut.TofuUnity
 {
-    public static class GameObjectExtentions
+    public static class GameObjectExtensions
     {
         public static T RequireComponent<T>(this GameObject go) where T : MonoBehaviour
         {
