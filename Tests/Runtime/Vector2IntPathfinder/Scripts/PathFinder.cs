@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Tofunaut.TofuUnity.Samples.Vector2IntPathfinder
 {
     public class PathFinder : MonoBehaviour
     {
-        public const int Size = 16;
+        public const int Size = 32;
 
         public Obstacle from;
         public Obstacle to;
@@ -16,6 +17,13 @@ namespace Tofunaut.TofuUnity.Samples.Vector2IntPathfinder
         {
             _fromCoord = Vector2Int.one * int.MinValue;
             _toCoord = Vector2Int.one * int.MinValue;
+
+            ObstacleSpawner.OnEnabled += ObstacleSpawner_OnEnabled;
+        }
+
+        private void OnDisable()
+        {
+            ObstacleSpawner.OnEnabled -= ObstacleSpawner_OnEnabled;
         }
 
         private void Update()
@@ -50,25 +58,35 @@ namespace Tofunaut.TofuUnity.Samples.Vector2IntPathfinder
 
             if (didChange)
             {
-                for (int x = 0; x < Size; x++)
-                {
-                    for (int y = 0; y < Size; y++)
-                    {
-                        OpenTile.SetAsPathMember(new Vector2Int(x, y), false);
-                    }
-                }
+                RePath();
+            }
+        }
 
-                Vector2Int[] path = TofuUnity.Vector2IntPathfinder.GetPath(_fromCoord, _toCoord, (Vector2Int coord) =>
-                {
-                    bool toReturn = coord.x >= 0 && coord.x < PathFinder.Size && coord.y >= 0 && coord.y < PathFinder.Size && Obstacle.CanOccupy(coord);
-                    toReturn |= coord == _toCoord;
-                    return toReturn;
-                });
+        private void ObstacleSpawner_OnEnabled(object sender, EventArgs e)
+        {
+            RePath();
+        }
 
-                for (int i = 0; i < path.Length; i++)
+        private void RePath()
+        {
+            for (int x = 0; x < Size; x++)
+            {
+                for (int y = 0; y < Size; y++)
                 {
-                    OpenTile.SetAsPathMember(path[i], true);
+                    OpenTile.SetAsPathMember(new Vector2Int(x, y), false);
                 }
+            }
+
+            Vector2Int[] path = TofuUnity.Vector2IntPathfinder.GetPath(_fromCoord, _toCoord, (Vector2Int coord) =>
+            {
+                bool toReturn = coord.x >= 0 && coord.x < PathFinder.Size && coord.y >= 0 && coord.y < PathFinder.Size && Obstacle.CanOccupy(coord);
+                toReturn |= coord == _toCoord;
+                return toReturn;
+            });
+
+            for (int i = 0; i < path.Length; i++)
+            {
+                OpenTile.SetAsPathMember(path[i], true);
             }
         }
     }

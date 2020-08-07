@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tofunaut.TofuUnity.Samples.Vector2IntPathfinder
 {
     public class ObstacleSpawner : MonoBehaviour
     {
+        public static event EventHandler OnEnabled;
+
         public Obstacle obstaclePrefab;
         public int obstacleSpawnTries;
         public OpenTile openTilePrefab;
@@ -15,6 +18,8 @@ namespace Tofunaut.TofuUnity.Samples.Vector2IntPathfinder
         private void OnEnable()
         {
             Spawn();
+
+            OnEnabled?.Invoke(this, EventArgs.Empty);
         }
 
         public void Spawn()
@@ -47,7 +52,7 @@ namespace Tofunaut.TofuUnity.Samples.Vector2IntPathfinder
 
             for (int i = 0; i < obstacleSpawnTries; i++)
             {
-                Vector2Int coord = new Vector2Int(Random.Range(0, PathFinder.Size), Random.Range(0, PathFinder.Size));
+                Vector2Int coord = new Vector2Int(UnityEngine.Random.Range(0, PathFinder.Size), UnityEngine.Random.Range(0, PathFinder.Size));
                 if (!Obstacle.CanOccupy(coord))
                 {
                     continue;

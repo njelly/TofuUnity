@@ -2,6 +2,7 @@
 
 namespace Tofunaut.TofuUnity
 {
+    [ExecuteInEditMode]
     public class SpriteOrderInLayerByY : MonoBehaviour
     {
         public SpriteRenderer spriteRenderer;
@@ -9,8 +10,12 @@ namespace Tofunaut.TofuUnity
 
         private void LateUpdate()
         {
-            spriteRenderer.sortingOrder = Mathf.CeilToInt(transform.position.y);
+            if (!spriteRenderer)
+            {
+                return;
+            }
 
+            spriteRenderer.sortingOrder = Mathf.CeilToInt(transform.position.y);
             if (invert)
             {
                 spriteRenderer.sortingOrder *= -1;
