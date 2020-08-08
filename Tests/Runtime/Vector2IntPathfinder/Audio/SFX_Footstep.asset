@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22f1d23d06201584dbaf87281708e137, type: 3}
+  m_Name: SFX_Footstep
+  m_EditorClassIdentifier: 
+  _clips:
+  - {fileID: 8300000, guid: bd0d6682e23cb704593eb11a0ce745dd, type: 3}
+  - {fileID: 8300000, guid: 0f2b4043ced43bc4bbb935b4400b2748, type: 3}
+  - {fileID: 8300000, guid: 917d11fee5940dc44bb4e29ef0a8078f, type: 3}
+  - {fileID: 8300000, guid: 18057c45ebea9a5428b385f3ca6bf374, type: 3}
+  - {fileID: 8300000, guid: b11b92ad791c54d48add5d0fa89c0c26, type: 3}
+  - {fileID: 8300000, guid: 05bac79f6cc3c5646ad91f77f514242c, type: 3}
+  - {fileID: 8300000, guid: 6db5a962b8a39914dbe64c4370b3d6c1, type: 3}
+  - {fileID: 8300000, guid: 4f056f547d7ad9a4093a32bfbd620bf2, type: 3}
+  _volume: 1
+  _loop: 1
+  _interval: 0
+  _randomize: 1
+  _allowRandomRepeats: 0
+  _spatialBlend: 1
