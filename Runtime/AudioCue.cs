@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +16,17 @@ namespace Tofunaut.TofuUnity
         [SerializeField] private float _interval = -1;
         [SerializeField] private bool _randomize;
         [SerializeField] private bool _allowRandomRepeats;
+        [Space(10)]
+        [Tooltip("rule of thumb: 0 for music, 1 for SFX, no common reason for in-between values")]
         [SerializeField, Range(0f, 1f)] private float _spatialBlend;
+        [Tooltip("keep close to gameObject but increase if the sound is too quiet on screen")]
+        [SerializeField] private float _minSpatialRadius = 1;
+        [Tooltip("beyond this will be muted, keep in mind camera viewport and what the player should hear")]
+        [SerializeField] private float _maxSpatialRadius = 100;
+        // TODO: Unity does not have a Debug.DrawSphere()
+        //[Header("Debug")]
+        //[SerializeField] private bool _showDebug;
+        //[SerializeField] private Color _spatialRadiusColor = Color.green;
 
         public void Play() => Play(null, () => { return true; });
         public void Play(Func<bool> condition) => Play(null, condition);
@@ -67,7 +76,8 @@ namespace Tofunaut.TofuUnity
         {
             audioSource.volume = _volume;
             audioSource.spatialBlend = _spatialBlend;
-
+            audioSource.minDistance = _minSpatialRadius;
+            audioSource.maxDistance = _maxSpatialRadius;
             audioSource.PlayOneShot(_clips[clipIndex]);
 
             float intervalToUse;

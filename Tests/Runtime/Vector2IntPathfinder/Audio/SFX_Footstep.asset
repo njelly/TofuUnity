@@ -23,7 +23,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4f056f547d7ad9a4093a32bfbd620bf2, type: 3}
   _volume: 1
   _loop: 1
-  _interval: 0
+  _interval: 0.2
   _randomize: 1
   _allowRandomRepeats: 0
   _spatialBlend: 1
+  _minSpatialRadius: 1
+  _maxSpatialRadius: 100
