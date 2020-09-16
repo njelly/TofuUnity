@@ -1,11 +1,11 @@
 {
   "name": "com.tofunaut.tofuunity",
   "displayName": "TofuUnity",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "unity": "2019.4",
   "description": "A collection of utility scripts for Unity",
   "dependencies": {
-    "com.unity.addressables": "1.8.5"
+    "com.unity.addressables": "1.15.1"
   },
   "author": {
     "name": "Nathaniel Ellingson",

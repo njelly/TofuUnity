@@ -24,15 +24,15 @@ namespace Tofunaut.TofuUnity
             }
             if (!int.TryParse(parts[0], out major))
             {
-                Debug.LogError(string.Format("Could not parse the string [{0}] to an integer for the major version", parts[0]));
+                Debug.LogError($"Could not parse the string [{parts[0]}] to an integer for the major version");
             }
             if (!int.TryParse(parts[1], out minor))
             {
-                Debug.LogError(string.Format("Could not parse the string [{0}] to an integer for the minor version", parts[1]));
+                Debug.LogError($"Could not parse the string [{parts[1]}] to an integer for the minor version");
             }
             if (!int.TryParse(parts[2], out build))
             {
-                Debug.LogError(string.Format("Could not parse the string [{0}] to an integer for the build version", parts[2]));
+                Debug.LogError($"Could not parse the string [{parts[2]}] to an integer for the build version");
             }
         }
 
