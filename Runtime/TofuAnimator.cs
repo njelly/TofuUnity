@@ -200,12 +200,14 @@ namespace Tofunaut.TofuUnity
         public delegate float CurveCallback(float percent);
 
         private List<Sequence> _activeSequences;
-        private List<Sequence> _toAdd = new List<Sequence>();
+        private HashSet<Sequence> _toAdd = new HashSet<Sequence>();
+        private HashSet<Sequence> _toRemove = new HashSet<Sequence>();
 
         private void Awake()
         {
             _activeSequences = new List<Sequence>();
-            _toAdd = new List<Sequence>();
+            _toAdd = new HashSet<Sequence>();
+            _toRemove = new HashSet<Sequence>();
         }
 
         private void Update()
@@ -217,21 +219,28 @@ namespace Tofunaut.TofuUnity
             }
             _toAdd.Clear();
 
-            HashSet<Sequence> toRemove = new HashSet<Sequence>();
+            foreach (Sequence toRemove in _toRemove)
+            {
+                NumSequencesPlaying--;
+                _activeSequences.Remove(toRemove);
+            }
+            _toRemove.Clear();
+
             foreach (Sequence activeSequence in _activeSequences)
             {
                 activeSequence.Update(Time.deltaTime);
                 if (activeSequence.AllComplete)
                 {
-                    toRemove.Add(activeSequence);
+                    _toRemove.Add(activeSequence);
                 }
             }
 
-            foreach (Sequence completeSequence in toRemove)
+            foreach (Sequence completeSequence in _toRemove)
             {
                 NumSequencesPlaying--;
                 _activeSequences.Remove(completeSequence);
             }
+            _toRemove.Clear();
         }
 
         public static void Play(GameObject gameObject, Sequence sequence)
@@ -240,17 +249,22 @@ namespace Tofunaut.TofuUnity
             tofuAnimator._toAdd.Add(sequence);
         }
 
+        public static void Stop(Sequence sequence)
+        {
+            sequence.target.RequireComponent<TofuAnimator>()._toRemove.Add(sequence);
+        }
+
         public class Sequence
         {
             public bool AllComplete => _clipSequence.Count == 0;
 
             private Queue<List<Clip>> _clipSequence;
             private List<Clip> _toEnqueue;
-            private readonly GameObject _target;
+            public readonly GameObject target;
 
             public Sequence(GameObject target)
             {
-                _target = target;
+                this.target = target;
                 _clipSequence = new Queue<List<Clip>>();
                 _toEnqueue = new List<Clip>();
             }
@@ -304,7 +318,7 @@ namespace Tofunaut.TofuUnity
             public void Play()
             {
                 Then();
-                _target.PlaySequence(this);
+                target.PlaySequence(this);
             }
 
             public bool Update(float deltaTime)
