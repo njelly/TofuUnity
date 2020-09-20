@@ -28,7 +28,6 @@ namespace Tofunaut.TofuUnity.Samples
 
                 float waitTime = offsetTime;
 
-
                 instance.gameObject.Sequence()
                     .Wait(waitTime)
                     .Then()
@@ -37,7 +36,6 @@ namespace Tofunaut.TofuUnity.Samples
                         instance.value = percent;
                     })
                     .Play();
-
 
                 offsetTime += animOffset;
             }
@@ -66,6 +64,14 @@ namespace Tofunaut.TofuUnity.Samples
                     .Play();
 
                 offsetTime += animOffset;
+            }
+        }
+
+        public void StopAll()
+        {
+            foreach (Slider slider in _sliders)
+            {
+                TofuAnimator.StopAll(slider.gameObject);
             }
         }
     }

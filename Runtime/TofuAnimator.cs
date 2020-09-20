@@ -249,9 +249,17 @@ namespace Tofunaut.TofuUnity
             tofuAnimator._toAdd.Add(sequence);
         }
 
-        public static void Stop(Sequence sequence)
+        public static void Stop(GameObject gameObject, Sequence sequence)
         {
-            sequence.target.RequireComponent<TofuAnimator>()._toRemove.Add(sequence);
+            gameObject.RequireComponent<TofuAnimator>()._toRemove.Add(sequence);
+        }
+
+        public static void StopAll(GameObject gameObject)
+        {
+            TofuAnimator tofuAnimator = gameObject.RequireComponent<TofuAnimator>();
+            NumSequencesPlaying -= tofuAnimator._activeSequences.Count;
+            tofuAnimator._activeSequences.Clear();
+            tofuAnimator._toRemove.Clear();
         }
 
         public class Sequence
@@ -260,11 +268,11 @@ namespace Tofunaut.TofuUnity
 
             private Queue<List<Clip>> _clipSequence;
             private List<Clip> _toEnqueue;
-            public readonly GameObject target;
+            private readonly GameObject _target;
 
             public Sequence(GameObject target)
             {
-                this.target = target;
+                this._target = target;
                 _clipSequence = new Queue<List<Clip>>();
                 _toEnqueue = new List<Clip>();
             }
@@ -318,7 +326,12 @@ namespace Tofunaut.TofuUnity
             public void Play()
             {
                 Then();
-                target.PlaySequence(this);
+                _target.PlaySequence(this);
+            }
+
+            public void Stop()
+            {
+                TofuAnimator.Stop(_target, this);
             }
 
             public bool Update(float deltaTime)
