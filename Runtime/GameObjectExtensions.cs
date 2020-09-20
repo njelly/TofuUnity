@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 
 namespace Tofunaut.TofuUnity
 {
@@ -13,6 +15,32 @@ namespace Tofunaut.TofuUnity
             }
 
             return toReturn;
+        }
+
+        public static T RequireInterface<T>(this GameObject go)
+        {
+            T toReturn = go.GetInterface<T>();
+            if(toReturn == null)
+            {
+                throw new InvalidOperationException($"the gameObject {go.name} must have a MonoBehaviour component of type {nameof(T)}");
+            }
+
+            return toReturn;
+        }
+
+        public static T GetInterface<T>(this GameObject go)
+        {
+            return go.GetInterfaces<T>().FirstOrDefault();
+        }
+
+        public static T[] GetInterfaces<T>(this GameObject go)
+        {
+            if (!typeof(T).IsInterface)
+            {
+                throw new InvalidOperationException($"the type {nameof(T)} must be an interface");
+            }
+
+            return go.GetComponents<MonoBehaviour>().OfType<T>().ToArray();
         }
 
         public static TofuAnimator.Sequence Sequence(this GameObject go)
