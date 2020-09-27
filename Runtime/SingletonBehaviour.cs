@@ -7,12 +7,22 @@ namespace Tofunaut.TofuUnity
     /// </summary>
     public abstract class SingletonBehaviour<T> : MonoBehaviour where T: MonoBehaviour
     {
-
+        /// <summary>
+        /// True if an instance of this type already exists.
+        /// </summary>
         public static bool HasInstance => _instance != null;
 
         protected static T _instance;
 
+        /// <summary>
+        /// Set the insance as DontDestroyOnLoad.
+        /// </summary>
         protected virtual bool SetDontDestroyOnLoad => false;
+
+        /// <summary>
+        /// If true, an error message will not be printed when another instance exists (sometimes second instances may be expected).
+        /// </summary>
+        protected virtual bool SuppressError => false;
 
         /// <summary>
         /// If true, destroy the gameObject when and instance already exists. If false, just destroy the component.
@@ -21,9 +31,12 @@ namespace Tofunaut.TofuUnity
 
         protected virtual void Awake()
         {
-            if(_instance != null)
+            if(HasInstance)
             {
-                Debug.LogErrorFormat("another instance of {0} already exists, this one will be destroyed", nameof(T));
+                if(!SuppressError)
+                {
+                    Debug.LogErrorFormat($"another instance of {typeof(T).FullName} already exists, this one will be destroyed");
+                }
                 
                 if(DestroyGameObjectWhenInstanceExists)
                 {
