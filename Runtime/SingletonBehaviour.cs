@@ -14,11 +14,26 @@ namespace Tofunaut.TofuUnity
 
         protected virtual bool SetDontDestroyOnLoad => false;
 
+        /// <summary>
+        /// If true, destroy the gameObject when and instance already exists. If false, just destroy the component.
+        /// </summary>
+        protected virtual bool DestroyGameObjectWhenInstanceExists => false;
+
         protected virtual void Awake()
         {
             if(_instance != null)
             {
                 Debug.LogErrorFormat("another instance of {0} already exists, this one will be destroyed", nameof(T));
+                
+                if(DestroyGameObjectWhenInstanceExists)
+                {
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    Destroy(this);
+                }
+
                 return;
             }
 
