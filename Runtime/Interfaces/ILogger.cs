@@ -1,6 +1,6 @@
 ﻿namespace Tofunaut.TofuUnity
 {
-    public interface ITofuLogger
+    public interface ILogger
     {
         void Info(string s);
         void Warn(string s);
