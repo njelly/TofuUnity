@@ -2,7 +2,7 @@
 
 namespace Tofunaut.TofuUnity
 {
-    public class UnityLogger : MonoBehaviour, ILogger
+    public class UnityLogger : ILogger
     {
         public void Info(string s)
         {
