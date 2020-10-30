@@ -7,7 +7,7 @@ namespace Tofunaut.TofuUnity
     /// Represents a version in the form of integers [major].[minor].[build], as well as utility methods and 
     /// functions for validating versions and converting to and from a string.
     /// </summary>
-    public class TofuVersion
+    public class Version
     {
         public const char Delimiter = '.';
 
@@ -15,7 +15,7 @@ namespace Tofunaut.TofuUnity
         public readonly int minor;
         public readonly int build;
 
-        public TofuVersion(string s)
+        public Version(string s)
         {
             string[] parts = s.Split(Delimiter);
             if (parts.Length != 3)
@@ -41,20 +41,20 @@ namespace Tofunaut.TofuUnity
             return string.Format("{0}{1}{2}{1}{3}", major, Delimiter, minor, build);
         }
 
-        public static implicit operator string(TofuVersion v)
+        public static implicit operator string(Version v)
         {
             return v.ToString();
         }
 
-        public static implicit operator TofuVersion(string s)
+        public static implicit operator Version(string s)
         {
-            return new TofuVersion(s);
+            return new Version(s);
         }
 
         /// <summary>
         /// Returns true if the major version of required and current are equal, AND the minor version of required is less than or equal to the current. The build version is ignored.
         /// </summary>
-        public static bool IsValid(TofuVersion required, TofuVersion current)
+        public static bool IsValid(Version required, Version current)
         {
             if (required.major != current.major)
             {
