@@ -1,4 +1,5 @@
 using System.IO;
+using UnityEditor;
 #if UNITY_EDITOR
 using UnityEditor.Callbacks;
 #endif
@@ -43,9 +44,6 @@ namespace Tofunaut.TofuUnity
         /// <summary>
         /// Increments the build number by one and writes it to BuildNumber.txt
         /// </summary>
-        #if UNITY_EDITOR
-        [PostProcessBuild(1)]
-        #endif
         public static void IncrementBuildNumber()
         {
             var path = BuildNumberFilePath;
@@ -53,5 +51,13 @@ namespace Tofunaut.TofuUnity
             string[] lines = { newBuildNumber.ToString() };
             File.WriteAllLines(path, lines);
         }
+        
+#if UNITY_EDITOR
+        [PostProcessBuild(1)]
+        public static void IncrementBuildNumber(BuildTarget target, string pathToBuiltProject)
+        {
+            IncrementBuildNumber();
+        }
+#endif
     }
 }
