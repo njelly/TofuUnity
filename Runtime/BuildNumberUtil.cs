@@ -1,11 +1,14 @@
 using System.IO;
+#if UNITY_EDITOR
+using UnityEditor.Callbacks;
+#endif
 using UnityEngine;
 
 namespace Tofunaut.TofuUnity
 {
     public static class BuildNumberUtil
     {
-        private static string BuilNumberFilePath { get { return Path.Combine(Application.streamingAssetsPath, "BuildNumber.txt"); } }
+        private static string BuildNumberFilePath { get { return Path.Combine(Application.streamingAssetsPath, "BuildNumber.txt"); } }
 
         /// <summary>
         /// Gets the current build number by reading from BuildNumber.txt in the StreamingAssets folder.
@@ -13,19 +16,15 @@ namespace Tofunaut.TofuUnity
         /// </summary>
         public static int ReadBuildNumber()
         {
-            string path = BuilNumberFilePath;
+            var path = BuildNumberFilePath;
 
             if (File.Exists(path))
             {
-                string data = File.ReadAllText(path).Trim();
-                if (!int.TryParse(data, out int toReturn))
-                {
+                var data = File.ReadAllText(path).Trim();
+                if (!int.TryParse(data, out var toReturn))
                     Debug.LogErrorFormat("could not parse {0}", data);
-                }
                 else
-                {
                     return toReturn;
-                }
             }
             else
             {
@@ -33,9 +32,7 @@ namespace Tofunaut.TofuUnity
 
                 // check to make sure the directory exists before trying to write a file to it
                 if (!Directory.Exists(Application.streamingAssetsPath))
-                {
                     Directory.CreateDirectory(Application.streamingAssetsPath);
-                }
 
                 File.WriteAllLines(path, new[] { "0" });
             }
@@ -46,11 +43,13 @@ namespace Tofunaut.TofuUnity
         /// <summary>
         /// Increments the build number by one and writes it to BuildNumber.txt
         /// </summary>
+        #if UNITY_EDITOR
+        [PostProcessBuild(1)]
+        #endif
         public static void IncrementBuildNumber()
         {
-            string path = BuilNumberFilePath;
-
-            int newBuildNumber = ReadBuildNumber() + 1;
+            var path = BuildNumberFilePath;
+            var newBuildNumber = ReadBuildNumber() + 1;
             string[] lines = { newBuildNumber.ToString() };
             File.WriteAllLines(path, lines);
         }
