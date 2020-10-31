@@ -19,7 +19,18 @@ namespace Tofunaut.TofuUnity
 
             return (ECardinalDirection8)octant;
         }
-
+        
+        public static Vector2 Rotate(this Vector2 v, float degrees)
+        {
+            var sin = Mathf.Sin(degrees * Mathf.Deg2Rad);
+            var cos = Mathf.Cos(degrees * Mathf.Deg2Rad);
+            var tx = v.x;
+            var ty = v.y;
+            v.x = cos * tx - sin * ty;
+            v.y = sin * tx + cos * ty;
+            return v;
+        }
+        
         public static bool HasLength(this Vector3 v) => 
             Mathf.Abs(v.x) > float.Epsilon || Mathf.Abs(v.y) > float.Epsilon || Mathf.Abs(v.z) > float.Epsilon;
 
