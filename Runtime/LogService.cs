@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Tofunaut.TofuUnity.Interfaces;
 
 namespace Tofunaut.TofuUnity
 {

@@ -1,4 +1,4 @@
-﻿namespace Tofunaut.TofuUnity
+﻿namespace Tofunaut.TofuUnity.Interfaces
 {
     public interface IVersionProvider
     {

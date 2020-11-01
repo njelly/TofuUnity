@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ILogger = Tofunaut.TofuUnity.Interfaces.ILogger;
 
 namespace Tofunaut.TofuUnity
 {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Tofunaut.TofuUnity.Interfaces;
+using UnityEngine;
 
 namespace Tofunaut.TofuUnity
 {

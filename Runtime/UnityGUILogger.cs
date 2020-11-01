@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Tofunaut.TofuUnity.Interfaces;
 using UnityEngine;
+using ILogger = Tofunaut.TofuUnity.Interfaces.ILogger;
 
 namespace Tofunaut.TofuUnity
 {
