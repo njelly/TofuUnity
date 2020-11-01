@@ -23,5 +23,9 @@ namespace Tofunaut.TofuUnity
         {
             return v.Rotate90Clockwise().Rotate90Clockwise().Rotate90Clockwise();
         }
+        
+        public static Vector3 ToVector3(this Vector3Int v) => new Vector3(v.x, v.y, v.z);
+        
+        public static Vector2 ToVector2(this Vector2Int v) => new Vector2(v.x, v.y);
     }
 }
