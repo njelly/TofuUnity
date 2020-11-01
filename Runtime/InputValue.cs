@@ -7,6 +7,7 @@ namespace Tofunaut.TofuUnity
         public float TimePressed { get; protected set; } = float.MinValue;
         public float TimeReleased { get; protected set; } = float.MinValue;
 
+        public float TimeHeld => Held ? 0f : Time.time - TimePressed;
         public bool Held => TimePressed >= 0f && TimePressed >= TimeReleased;
         public bool WasReleased => Mathf.Abs(TimeReleased - Time.time).IsApproximately(0f);
         public bool WasPressed => Mathf.Abs(TimePressed - Time.time).IsApproximately(0f);
