@@ -191,12 +191,13 @@ namespace Tofunaut.TofuUnity
                     break;
             }
 
-            return (float v) => proxyCallback(0, 1, v);
+            return v => proxyCallback(0, 1, v);
         }
 
         public static int NumSequencesPlaying { get; private set; }
 
-        public delegate void ValueCallback(float percent);
+        public delegate void FloatValueCallback(float percent);
+        public delegate void IntValueCallback(int num);
         public delegate float CurveCallback(float percent);
 
         private List<Sequence> _activeSequences;
@@ -212,21 +213,21 @@ namespace Tofunaut.TofuUnity
 
         private void Update()
         {
-            foreach (Sequence toAdd in _toAdd)
+            foreach (var toAdd in _toAdd)
             {
                 NumSequencesPlaying++;
                 _activeSequences.Add(toAdd);
             }
             _toAdd.Clear();
 
-            foreach (Sequence toRemove in _toRemove)
+            foreach (var toRemove in _toRemove)
             {
                 NumSequencesPlaying--;
                 _activeSequences.Remove(toRemove);
             }
             _toRemove.Clear();
 
-            foreach (Sequence activeSequence in _activeSequences)
+            foreach (var activeSequence in _activeSequences)
             {
                 activeSequence.Update(Time.deltaTime);
                 if (activeSequence.AllComplete)
@@ -235,7 +236,7 @@ namespace Tofunaut.TofuUnity
                 }
             }
 
-            foreach (Sequence completeSequence in _toRemove)
+            foreach (var completeSequence in _toRemove)
             {
                 NumSequencesPlaying--;
                 _activeSequences.Remove(completeSequence);
@@ -245,7 +246,7 @@ namespace Tofunaut.TofuUnity
 
         public static void Play(GameObject gameObject, Sequence sequence)
         {
-            TofuAnimator tofuAnimator = gameObject.RequireComponent<TofuAnimator>();
+            var tofuAnimator = gameObject.RequireComponent<TofuAnimator>();
             tofuAnimator._toAdd.Add(sequence);
         }
 
@@ -256,7 +257,7 @@ namespace Tofunaut.TofuUnity
 
         public static void StopAll(GameObject gameObject)
         {
-            TofuAnimator tofuAnimator = gameObject.RequireComponent<TofuAnimator>();
+            var tofuAnimator = gameObject.RequireComponent<TofuAnimator>();
             NumSequencesPlaying -= tofuAnimator._activeSequences.Count;
             tofuAnimator._activeSequences.Clear();
             tofuAnimator._toRemove.Clear();
@@ -272,21 +273,42 @@ namespace Tofunaut.TofuUnity
 
             public Sequence(GameObject target)
             {
-                this._target = target;
+                _target = target;
                 _clipSequence = new Queue<List<Clip>>();
                 _toEnqueue = new List<Clip>();
             }
 
-            public Sequence Curve(EEaseType easeType, float time, ValueCallback callback)
+            public Sequence Curve(EEaseType easeType, float time, FloatValueCallback callback)
             {
-                _toEnqueue.Add(new Clip(TofuAnimator.EaseTypeToCallback(easeType), time, callback));
+                _toEnqueue.Add(new Clip(EaseTypeToCallback(easeType), time, callback));
+
+                return this;
+            }
+
+            public Sequence Count(int from, int to, float interval, IntValueCallback callback)
+            {
+                var prev = from;
+                
+                _toEnqueue.Add(new Clip(EaseTypeToCallback(EEaseType.Linear), (to - from) * interval, v =>
+                {
+                    var lerpValue = Mathf.Lerp(from, to, v);
+                    var rounded = Mathf.RoundToInt(lerpValue);
+                    if (rounded == prev)
+                        return;
+
+                    // make sure we always invoke the callback for each count step
+                    while (rounded > prev)
+                        callback(++prev);
+
+                    prev = rounded;
+                }));
 
                 return this;
             }
 
             public Sequence Wait(float time)
             {
-                float timer = 0f;
+                var timer = 0f;
 
                 return WaitUntil(() =>
                 {
@@ -337,24 +359,16 @@ namespace Tofunaut.TofuUnity
             public bool Update(float deltaTime)
             {
                 if (AllComplete)
-                {
                     return true;
-                }
 
-                List<Clip> currentStep = _clipSequence.Peek();
-                bool isComplete = true;
-                foreach (Clip clip in currentStep)
-                {
+                var currentStep = _clipSequence.Peek();
+                var isComplete = true;
+                foreach (var clip in currentStep)
                     if (!clip.Update(deltaTime))
-                    {
                         isComplete = false;
-                    }
-                }
 
                 if (isComplete)
-                {
                     _clipSequence.Dequeue();
-                }
 
                 return isComplete;
             }
@@ -363,13 +377,13 @@ namespace Tofunaut.TofuUnity
         private class Clip
         {
             private readonly float _time;
-            private readonly ValueCallback _callback;
+            private readonly FloatValueCallback _callback;
             private readonly CurveCallback _curveCallback;
 
             private float _timer;
             private bool _complete;
 
-            public Clip(CurveCallback curveCallback, float time, ValueCallback callback)
+            public Clip(CurveCallback curveCallback, float time, FloatValueCallback callback)
             {
                 _callback = callback;
                 _curveCallback = curveCallback;
@@ -382,17 +396,13 @@ namespace Tofunaut.TofuUnity
             public bool Update(float deltaTime)
             {
                 if (_complete)
-                {
                     return true;
-                }
 
                 _timer += deltaTime;
                 if (_timer >= _time)
-                {
                     _timer = _time;
-                }
 
-                float percent = _curveCallback(_timer / _time);
+                var percent = _curveCallback(_timer / _time);
 
                 _callback(percent);
 
