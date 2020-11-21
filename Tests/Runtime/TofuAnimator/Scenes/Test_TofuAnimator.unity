@@ -282,8 +282,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 295, y: 202}
-  m_SizeDelta: {x: -610, y: 30}
+  m_AnchoredPosition: {x: 93.6, y: 291}
+  m_SizeDelta: {x: -207.18677, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &297034547
 MonoBehaviour:
@@ -529,6 +529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 046490306fd7aa34a9c246a993421ae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  test: {fileID: 0}
   sliderInstance: {fileID: 25143653}
   animOffset: 0.05
   animTime: 2
@@ -569,7 +570,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 147.6, y: 0}
+  m_AnchoredPosition: {x: 147.6, y: 29}
   m_SizeDelta: {x: 277.2864, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1054089033
@@ -1048,7 +1049,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -95, y: 202}
+  m_AnchoredPosition: {x: -95, y: 291}
   m_SizeDelta: {x: -210, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1695546229
