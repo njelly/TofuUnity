@@ -1,6 +1,6 @@
 ﻿using UnityEngine.UI;
 
-namespace Tofunaut.TofuUnity
+namespace Tofunaut.TofuUnity.UI
 {
     /// <summary>
     /// A non-drawing graphic is an efficient way to add the ability to hit a UI element that does not need any drawn graphics. Like an input rect.

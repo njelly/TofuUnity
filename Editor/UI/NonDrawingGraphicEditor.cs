@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEditor.UI;
 
-namespace Tofunaut.TofuUnity
+namespace Tofunaut.TofuUnity.UI.Editor
 {
     /// <summary>
     /// Based on the implementation described at:
