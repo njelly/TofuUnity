@@ -27,9 +27,12 @@ namespace Tofunaut.TofuUnity.Editor
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos, GUILayout.ExpandHeight(true));
             _text = EditorGUILayout.TextArea(_text, GUILayout.ExpandHeight(true));
             EditorGUILayout.EndScrollView();
-            
+
             if (GUILayout.Button("Import"))
+            {
                 _onComplete?.Invoke(_text);
+                Close();
+            }
         }
 
         private void ImportFromFile()
