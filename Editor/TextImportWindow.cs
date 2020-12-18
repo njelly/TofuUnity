@@ -11,12 +11,12 @@ namespace Tofunaut.TofuUnity.Editor
         private Vector2 _scrollPos;
         private string _text;
         
-        public static void Init(string title, Action<string> onComplete)
+        public static void Init(string title, string initialText, Action<string> onComplete)
         {
             var window = (TextImportWindow) EditorWindow.GetWindow(typeof(TextImportWindow));
             window.titleContent = new GUIContent(title);
             window._onComplete = onComplete;
-            window._text = string.Empty;
+            window._text = initialText;
         }
 
         public void OnGUI()
