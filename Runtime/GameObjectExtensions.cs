@@ -6,41 +6,33 @@ namespace Tofunaut.TofuUnity
 {
     public static class GameObjectExtensions
     {
-        public static T RequireComponent<T>(this GameObject go) where T : MonoBehaviour
+        public static T RequireComponent<T>(this GameObject go) where T : Component
         {
-            T toReturn = go.GetComponent<T>();
+            var toReturn = go.GetComponent<T>();
             if (toReturn == null)
-            {
                 toReturn = go.AddComponent<T>();
-            }
 
             return toReturn;
         }
 
-        public static T RequireInterface<T>(this GameObject go)
+        public static T RequireType<T>(this GameObject go)
         {
-            T toReturn = go.GetInterface<T>();
+            var toReturn = go.GetType<T>();
             if(toReturn == null)
-            {
                 throw new InvalidOperationException($"the gameObject {go.name} must have a MonoBehaviour component of type {nameof(T)}");
-            }
+
 
             return toReturn;
         }
 
-        public static T GetInterface<T>(this GameObject go)
+        public static T GetType<T>(this GameObject go)
         {
-            return go.GetInterfaces<T>().FirstOrDefault();
+            return go.GetTypes<T>().FirstOrDefault();
         }
 
-        public static T[] GetInterfaces<T>(this GameObject go)
+        public static T[] GetTypes<T>(this GameObject go)
         {
-            if (!typeof(T).IsInterface)
-            {
-                throw new InvalidOperationException($"the type {nameof(T)} must be an interface");
-            }
-
-            return go.GetComponents<MonoBehaviour>().OfType<T>().ToArray();
+            return go.GetComponents<Component>().OfType<T>().ToArray();
         }
 
         public static TofuAnimator.Sequence Sequence(this GameObject go)
