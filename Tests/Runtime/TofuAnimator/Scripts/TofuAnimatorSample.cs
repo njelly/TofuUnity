@@ -8,8 +8,6 @@ namespace Tofunaut.TofuUnity.Samples
 {
     public class TofuAnimatorSample : MonoBehaviour
     {
-        [RequireType(typeof(UnityEngine.Object))] public UnityEngine.Object test;
-        
         public Slider sliderInstance;
         public float animOffset = 1f;
         public float animTime = 3f;
