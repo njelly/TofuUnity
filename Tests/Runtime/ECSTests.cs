@@ -27,14 +27,17 @@ namespace Tests.Runtime
             
             for(var i = 0; i < num; i++)
                 ecs.Tick();
+            
+            Assert.IsTrue(ecs.CurrentFrame.Get<Count>(e) == null);
 
-            // get a new entity
+            // get a new entity, create a dummy first 
+            ecs.CurrentFrame.Create();
             e = ecs.CurrentFrame.Create();
             ecs.CurrentFrame.Add<Count>(e);
             for(var i = 0; i < num; i++)
                 ecs.Tick();
             
-            Assert.IsTrue(ecs.CurrentFrame.Get<Count>(e)->value == 2*num);
+            Assert.IsTrue(ecs.CurrentFrame.Get<Count>(e)->value == num);
         }
 
         private struct Count

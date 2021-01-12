@@ -71,14 +71,14 @@ namespace Tofunaut.TofuECS
             _typeToBag = previous._typeToBag;
             _typeToFilters = previous._typeToFilters;
             _systems = previous._systems;
+            _entityCounter = previous._entityCounter;
             _entityToComponentTypes = previous._entityToComponentTypes;
             _number = previous._number + 1;
         }
 
         public ulong Create()
         {
-            _entityCounter++;
-            _entityToComponentTypes.Add(_entityCounter, new List<Type>());
+            _entityToComponentTypes.Add(++_entityCounter, new List<Type>());
             return _entityCounter;
         }
 
