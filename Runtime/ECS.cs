@@ -33,9 +33,9 @@ namespace Tofunaut.TofuECS
     {
         public Frame CurrentFrame { get; private set; }
 
-        public ECS()
+        public ECS(object config)
         {
-            CurrentFrame = new Frame();
+            CurrentFrame = new Frame(config);
         }
 
         public void Tick()
@@ -54,16 +54,21 @@ namespace Tofunaut.TofuECS
         private List<ECSSystem> _systems;
         private ulong _number;
         private Dictionary<ulong, List<Type>> _entityToComponentTypes;
+        private readonly ECS _ecs;
+        private readonly object _config;
+        
+        public T Config<T>() => (T) _config;
 
         public ulong Number => _number;
 
-        public Frame()
+        public Frame(object config)
         {
             _typeToBag = new Dictionary<Type, object>();
             _typeToFilters = new Dictionary<Type, (bool, object)>();
             _systems = new List<ECSSystem>();
             _entityToComponentTypes = new Dictionary<ulong, List<Type>>();
             _number = 0;
+            _config = config;
         }
 
         public Frame(Frame previous)
@@ -74,6 +79,8 @@ namespace Tofunaut.TofuECS
             _entityCounter = previous._entityCounter;
             _entityToComponentTypes = previous._entityToComponentTypes;
             _number = previous._number + 1;
+            _ecs = previous._ecs;
+            _config = previous._config;
         }
 
         public ulong Create()
