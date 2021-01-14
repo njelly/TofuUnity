@@ -3,14 +3,22 @@ using UnityEngine.Events;
 
 namespace Tofunaut.TofuUnity
 {
-    public abstract class AppStateController<T> : SingletonBehaviour<T> where T : MonoBehaviour
+    
+    public abstract class AppStateController<T1, T2> : SingletonBehaviour<T1> where T1 : MonoBehaviour where T2 : IAppStateModel
     {
         public bool IsComplete { get; private set; }
         public bool IsReady { get; protected set; }
+        
+        public T2 Model { get; private set; }
 
-        public void Complete()
+        public virtual void Complete()
         {
             IsComplete = true;
+        }
+
+        public virtual void SetModel(T2 model)
+        {
+            Model = model;
         }
     }
 }

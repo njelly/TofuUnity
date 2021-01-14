@@ -31,7 +31,7 @@ namespace Tofunaut.TofuECS
     [Serializable]
     public class ECS
     {
-        public Frame CurrentFrame { get; private set; }
+        public Frame CurrentFrame { get; set; }
 
         public ECS(object config)
         {
@@ -45,16 +45,34 @@ namespace Tofunaut.TofuECS
         }
     }
 
-    [Serializable]
     public unsafe class Frame
     {
+        [Serializable]
+        public class FrameState
+        {
+            public Dictionary<Type, object> typeToBag;
+            public Dictionary<Type, (bool, object)> typeToFilters;
+            public ulong entityCounter;
+            public Dictionary<ulong, List<Type>> entityToComponentTypes;
+
+            public FrameState Copy()
+            {
+                return new FrameState
+                {
+                    typeToBag = new Dictionary<Type, object>(typeToBag),
+                    typeToFilters = new Dictionary<Type, (bool, object)>(typeToFilters),
+                    entityCounter = entityCounter,
+                    entityToComponentTypes = new Dictionary<ulong, List<Type>>(entityToComponentTypes),
+                };
+            }
+        }
+        
         private Dictionary<Type, object> _typeToBag;
         private Dictionary<Type, (bool, object)> _typeToFilters;
         private ulong _entityCounter;
         private List<ECSSystem> _systems;
         private ulong _number;
         private Dictionary<ulong, List<Type>> _entityToComponentTypes;
-        private readonly ECS _ecs;
         private readonly object _config;
         
         public T Config<T>() => (T) _config;
@@ -79,9 +97,10 @@ namespace Tofunaut.TofuECS
             _entityCounter = previous._entityCounter;
             _entityToComponentTypes = previous._entityToComponentTypes;
             _number = previous._number + 1;
-            _ecs = previous._ecs;
             _config = previous._config;
         }
+        
+        private Frame() { }
 
         public ulong Create()
         {
