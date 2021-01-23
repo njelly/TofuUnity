@@ -51,9 +51,6 @@ namespace Tests.Runtime
                 ecs.Tick();
             
             Assert.IsTrue(ecs.CurrentFrame.Get<Count>(e)->value == num);
-
-            var movingTransform = ecs.CurrentFrame.Get<TransformVel>(mover);
-            Debug.Log(movingTransform->position.ToString("F3"));
         }
 
         [Serializable]

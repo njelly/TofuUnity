@@ -25,6 +25,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tofunaut.TofuUnity;
+using Tofunaut.TofuUnity.Interfaces;
 
 namespace Tofunaut.TofuECS
 {
@@ -32,16 +34,49 @@ namespace Tofunaut.TofuECS
     public class ECS
     {
         public Frame CurrentFrame { get; set; }
+        private Blackboard _blackboard;
 
         public ECS(object config)
         {
             CurrentFrame = new Frame(config);
+            _blackboard = new Blackboard();
         }
 
         public void Tick()
         {
             CurrentFrame.Tick();
+            CurrentFrame.DequeueEvents(_blackboard);
             CurrentFrame = new Frame(CurrentFrame);
+        }
+
+        public void Subscribe<T>(Action<T> callback) where T : class, IBlackboardEvent
+        {
+            _blackboard.Subscribe(callback);
+        }
+
+        public void Unsubscribe<T>(Action<T> callback) where T : class, IBlackboardEvent
+        {
+            _blackboard.Unsubscribe(callback);
+        }
+    }
+
+    public class OnEntityCreatedEvent : IBlackboardEvent
+    {
+        public readonly ulong entity;
+
+        public OnEntityCreatedEvent(ulong entity)
+        {
+            this.entity = entity;
+        }
+    }
+
+    public class OnEntityDestroyedEvent : IBlackboardEvent
+    {
+        public readonly ulong entity;
+
+        public OnEntityDestroyedEvent(ulong entity)
+        {
+            this.entity = entity;
         }
     }
 
@@ -74,6 +109,7 @@ namespace Tofunaut.TofuECS
         private ulong _number;
         private Dictionary<ulong, List<Type>> _entityToComponentTypes;
         private readonly object _config;
+        private Queue<IBlackboardEvent> _queuedEvents;
         
         public T Config<T>() => (T) _config;
 
@@ -87,6 +123,7 @@ namespace Tofunaut.TofuECS
             _entityToComponentTypes = new Dictionary<ulong, List<Type>>();
             _number = 0;
             _config = config;
+            _queuedEvents = new Queue<IBlackboardEvent>();
         }
 
         public Frame(Frame previous)
@@ -98,6 +135,7 @@ namespace Tofunaut.TofuECS
             _entityToComponentTypes = previous._entityToComponentTypes;
             _number = previous._number + 1;
             _config = previous._config;
+            _queuedEvents = new Queue<IBlackboardEvent>();
         }
         
         private Frame() { }
@@ -105,6 +143,7 @@ namespace Tofunaut.TofuECS
         public ulong Create()
         {
             _entityToComponentTypes.Add(++_entityCounter, new List<Type>());
+            EnqueueEvent(new OnEntityCreatedEvent(_entityCounter));
             return _entityCounter;
         }
 
@@ -122,6 +161,8 @@ namespace Tofunaut.TofuECS
                     var bag = (IEntityComponentBag) ecbObj;
                     bag.Free(entity);
                 }
+            
+            EnqueueEvent(new OnEntityDestroyedEvent(entity));
         }
 
         public bool Exists(ulong entity)
@@ -205,6 +246,20 @@ namespace Tofunaut.TofuECS
             
             entityComponentBag = (EntityComponentBag<T>)ecb;
             return true;
+        }
+
+        public void EnqueueEvent(IBlackboardEvent blackboardEvent)
+        {
+            _queuedEvents.Enqueue(blackboardEvent);
+        }
+
+        public void DequeueEvents(Blackboard blackboard)
+        {
+            while (_queuedEvents.Count > 0)
+            {
+                var queuedEvent = _queuedEvents.Dequeue();
+                blackboard.Invoke(queuedEvent);
+            }
         }
     }
 
