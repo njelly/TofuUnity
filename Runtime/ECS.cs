@@ -80,6 +80,16 @@ namespace Tofunaut.TofuECS
         }
     }
 
+    public class OnComponentAddedEvent<T> : IBlackboardEvent where T : unmanaged
+    {
+        public readonly ulong entity;
+
+        public OnComponentAddedEvent(ulong entity)
+        {
+            this.entity = entity;
+        }
+    }
+
     public unsafe class Frame
     {
         [Serializable]
@@ -184,6 +194,7 @@ namespace Tofunaut.TofuECS
             typesList.Add(typeof(T));
 
             entityComponentBag.Assign(entity);
+            EnqueueEvent(new OnComponentAddedEvent<T>(entity));
         }
 
         public T* Get<T>(ulong entity) where T : unmanaged
