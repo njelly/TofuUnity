@@ -113,7 +113,7 @@ namespace Tofunaut.TofuECS
         }
         
         private Dictionary<Type, object> _typeToBag;
-        private Dictionary<Type, (bool, object)> _typeToFilters;
+        private Dictionary<Type[], (bool, object)> _typesToFilters;
         private ulong _entityCounter;
         private List<ECSSystem> _systems;
         private ulong _number;
@@ -128,7 +128,7 @@ namespace Tofunaut.TofuECS
         public Frame(object config)
         {
             _typeToBag = new Dictionary<Type, object>();
-            _typeToFilters = new Dictionary<Type, (bool, object)>();
+            _typesToFilters = new Dictionary<Type[], (bool, object)>();
             _systems = new List<ECSSystem>();
             _entityToComponentTypes = new Dictionary<ulong, List<Type>>();
             _number = 0;
@@ -139,7 +139,7 @@ namespace Tofunaut.TofuECS
         public Frame(Frame previous)
         {
             _typeToBag = previous._typeToBag;
-            _typeToFilters = previous._typeToFilters;
+            _typesToFilters = previous._typesToFilters;
             _systems = previous._systems;
             _entityCounter = previous._entityCounter;
             _entityToComponentTypes = previous._entityToComponentTypes;
@@ -163,14 +163,18 @@ namespace Tofunaut.TofuECS
                 return;
 
             foreach (var type in typesList)
-                if(_typeToBag.TryGetValue(type, out var ecbObj))
-                {
-                    if (_typeToFilters.TryGetValue(type, out var isDirty))
-                        isDirty.Item1 = true;
-                    
-                    var bag = (IEntityComponentBag) ecbObj;
-                    bag.Free(entity);
-                }
+            {
+                var relevantKeys = _typesToFilters.Keys.Where(x => x.Contains(type));
+                foreach (var relevantKey in relevantKeys)
+                    if(_typeToBag.TryGetValue(type, out var ecbObj))
+                    {
+                        if (_typesToFilters.TryGetValue(relevantKey, out var isDirty))
+                            isDirty.Item1 = true;
+                        
+                        var bag = (IEntityComponentBag) ecbObj;
+                        bag.Free(entity);
+                    }
+            }
             
             EnqueueEvent(new OnEntityDestroyedEvent(entity));
         }
@@ -185,8 +189,10 @@ namespace Tofunaut.TofuECS
             if (!TryGetEntityComponentBag<T>(out var entityComponentBag))
                 throw new Exception($"the type {nameof(T)} is not registered");
 
-            if (_typeToFilters.TryGetValue(typeof(T), out var tuple))
-                tuple.Item1 = true;
+            var relevantKeys = _typesToFilters.Keys.Where(x => x.Contains(typeof(T)));
+            foreach (var relevantKey in relevantKeys)
+                if (_typesToFilters.TryGetValue(relevantKey, out var tuple))
+                    tuple.Item1 = true;
             
             if (!_entityToComponentTypes.TryGetValue(entity, out var typesList))
                 throw new Exception($"the entity {entity} does not exist");
@@ -232,7 +238,7 @@ namespace Tofunaut.TofuECS
 
         public Filter<T> Filter<T>() where T : unmanaged
         {
-            if (_typeToFilters.TryGetValue(typeof(T), out var pair) && pair.Item1)
+            if (_typesToFilters.TryGetValue(new [] { typeof(T) }, out var pair) && pair.Item1)
             {
                 var filter = (Filter<T>)pair.Item2;
                 filter.Reset();
@@ -243,8 +249,53 @@ namespace Tofunaut.TofuECS
                 throw new Exception($"the type {nameof(T)} is not registered");
 
             var ecb = (EntityComponentBag<T>)ecbObj;
-            var cleanFilter = ecb.GetFilter();
-            _typeToFilters[typeof(T)] = (false, cleanFilter);
+            var cleanFilter = EntityComponentBag<T>.GetFilter(ecb);
+            _typesToFilters[new [] { typeof(T) }] = (false, cleanFilter);
+            return cleanFilter;
+        }
+
+        public Filter<T1, T2> Filter<T1, T2>() where T1 : unmanaged where T2 : unmanaged
+        {
+            if (_typesToFilters.TryGetValue(new [] { typeof(T1), typeof(T2) }, out var pair) && pair.Item1)
+            {
+                var filter = (Filter<T1, T2>)pair.Item2;
+                filter.Reset();
+                return filter;
+            }
+
+            if (!_typeToBag.TryGetValue(typeof(T1), out var ecbObj1))
+                throw new Exception($"the type {nameof(T1)} is not registered");
+            if (!_typeToBag.TryGetValue(typeof(T2), out var ecbObj2))
+                throw new Exception($"the type {nameof(T2)} is not registered");
+
+            var ecb1 = (EntityComponentBag<T1>)ecbObj1;
+            var ecb2 = (EntityComponentBag<T2>)ecbObj2;
+            var cleanFilter = EntityComponentBag<T1>.GetFilter(ecb1, ecb2);
+            _typesToFilters[new [] { typeof(T1), typeof(T2) }] = (false, cleanFilter);
+            return cleanFilter;
+        }
+
+        public Filter<T1, T2, T3> Filter<T1, T2, T3>() where T1 : unmanaged where T2 : unmanaged where T3 : unmanaged
+        {
+            if (_typesToFilters.TryGetValue(new [] { typeof(T1), typeof(T2), typeof(T3) }, out var pair) && pair.Item1)
+            {
+                var filter = (Filter<T1, T2, T3>)pair.Item2;
+                filter.Reset();
+                return filter;
+            }
+
+            if (!_typeToBag.TryGetValue(typeof(T1), out var ecbObj1))
+                throw new Exception($"the type {nameof(T1)} is not registered");
+            if (!_typeToBag.TryGetValue(typeof(T2), out var ecbObj2))
+                throw new Exception($"the type {nameof(T2)} is not registered");
+            if (!_typeToBag.TryGetValue(typeof(T3), out var ecbObj3))
+                throw new Exception($"the type {nameof(T3)} is not registered");
+
+            var ecb1 = (EntityComponentBag<T1>)ecbObj1;
+            var ecb2 = (EntityComponentBag<T2>)ecbObj2;
+            var ecb3 = (EntityComponentBag<T3>)ecbObj3;
+            var cleanFilter = EntityComponentBag<T1>.GetFilter(ecb1, ecb2, ecb3);
+            _typesToFilters[new [] { typeof(T1), typeof(T2), typeof(T3) }] = (false, cleanFilter);
             return cleanFilter;
         }
 
@@ -354,11 +405,26 @@ namespace Tofunaut.TofuECS
             return false;
         }
 
-        public Filter<T> GetFilter()
+        public static Filter<T1> GetFilter<T1>(EntityComponentBag<T1> bag) where T1 : unmanaged 
         {
-            var onlyInUse = new (bool, ulong, int)[_nextFreeIndex];
-            Array.Copy(_inUseToEntity, onlyInUse, _nextFreeIndex);
-            return new Filter<T>(this, onlyInUse.Select(x => x.Item2).ToArray());
+            return new Filter<T1>(bag, bag._inUseToEntity.Select(x => x.Item2).ToArray());
+        }
+
+        public static Filter<T1, T2> GetFilter<T1, T2>(EntityComponentBag<T1> bag1, EntityComponentBag<T2> bag2) where T1 : unmanaged where T2 : unmanaged
+        {
+            var bag1Entities = bag1._inUseToEntity.Select(x => x.Item2);
+            var bag2Entities = bag2._inUseToEntity.Select(x => x.Item2);
+            var commonEntities = bag1Entities.Where(x => bag2Entities.Contains(x)).ToArray();
+            return new Filter<T1, T2>(bag1, bag2, commonEntities);
+        }
+
+        public static Filter<T1, T2, T3> GetFilter<T1, T2, T3>(EntityComponentBag<T1> bag1, EntityComponentBag<T2> bag2, EntityComponentBag<T3> bag3) where T1 : unmanaged where T2 : unmanaged where T3 : unmanaged
+        {
+            var bag1Entities = bag1._inUseToEntity.Select(x => x.Item2);
+            var bag2Entities = bag2._inUseToEntity.Select(x => x.Item2);
+            var bag3Entities = bag3._inUseToEntity.Select(x => x.Item2);
+            var commonEntities = bag1Entities.Where(x => bag2Entities.Contains(x)).Where(x => bag3Entities.Contains(x)).ToArray();
+            return new Filter<T1, T2, T3>(bag1, bag2, bag3, commonEntities);
         }
     }
 
@@ -399,14 +465,16 @@ namespace Tofunaut.TofuECS
 
     public unsafe class Filter<T> where T : unmanaged
     {
-        private readonly EntityComponentBag<T> _entityComponentBag;
-        private readonly ulong[] _onlyInUse;
+        private readonly ulong[] _entitiesInUse;
+        private readonly T*[] _components;
         private int _currentIndex;
 
-        public Filter(EntityComponentBag<T> entityComponentBag, ulong[] onlyInUse)
+        public Filter(EntityComponentBag<T> entityComponentBag, ulong[] entitiesInUse)
         {
-            _entityComponentBag = entityComponentBag;
-            _onlyInUse = onlyInUse;
+            _entitiesInUse = entitiesInUse;
+            _components = new T*[entitiesInUse.Length];
+            for (var i = 0; i < entitiesInUse.Length; i++)
+                _components[i] = entityComponentBag.Get(entitiesInUse[i]);
             _currentIndex = 0;
         }
 
@@ -420,11 +488,104 @@ namespace Tofunaut.TofuECS
             entity = default;
             component = default;
 
-            if (_currentIndex >= _onlyInUse.Length)
+            if (_currentIndex >= _entitiesInUse.Length)
                 return false;
 
-            entity = _onlyInUse[_currentIndex];
-            component = _entityComponentBag.Get(entity);
+            entity = _entitiesInUse[_currentIndex];
+            component = _components[_currentIndex];
+            
+            _currentIndex++;
+
+            return true;
+        }
+    }
+
+    public unsafe class Filter<T1, T2> where T1 : unmanaged where T2 : unmanaged
+    {
+        private readonly ulong[] _entitiesInUse;
+        private readonly T1*[] _components1;
+        private readonly T2*[] _components2;
+        private int _currentIndex;
+
+        public Filter(EntityComponentBag<T1> entityComponentBag1, EntityComponentBag<T2> entityComponentBag2, ulong[] entitiesInUse)
+        {
+            _entitiesInUse = entitiesInUse;
+            _components1 = new T1*[entitiesInUse.Length];
+            _components2 = new T2*[entitiesInUse.Length];
+            for (var i = 0; i < entitiesInUse.Length; i++)
+            {
+                _components1[i] = entityComponentBag1.Get(entitiesInUse[i]);
+                _components2[i] = entityComponentBag2.Get(entitiesInUse[i]);
+            }
+            _currentIndex = 0;
+        }
+
+        public void Reset()
+        {
+            _currentIndex = 0;
+        }
+
+        public bool Next(out ulong entity, out T1* component1, out T2* component2)
+        {
+            entity = default;
+            component1 = default;
+            component2 = default;
+
+            if (_currentIndex >= _entitiesInUse.Length)
+                return false;
+
+            entity = _entitiesInUse[_currentIndex];
+            component1 = _components1[_currentIndex];
+            component2 = _components2[_currentIndex];
+            
+            _currentIndex++;
+
+            return true;
+        }
+    }
+
+    public unsafe class Filter<T1, T2, T3> where T1 : unmanaged where T2 : unmanaged where T3 : unmanaged
+    {
+        private readonly ulong[] _entitiesInUse;
+        private readonly T1*[] _components1;
+        private readonly T2*[] _components2;
+        private readonly T3*[] _components3;
+        private int _currentIndex;
+
+        public Filter(EntityComponentBag<T1> entityComponentBag1, EntityComponentBag<T2> entityComponentBag2, EntityComponentBag<T3> entityComponentBag3, ulong[] entitiesInUse)
+        {
+            _entitiesInUse = entitiesInUse;
+            _components1 = new T1*[entitiesInUse.Length];
+            _components2 = new T2*[entitiesInUse.Length];
+            _components3 = new T3*[entitiesInUse.Length];
+            for (var i = 0; i < entitiesInUse.Length; i++)
+            {
+                _components1[i] = entityComponentBag1.Get(entitiesInUse[i]);
+                _components2[i] = entityComponentBag2.Get(entitiesInUse[i]);
+                _components3[i] = entityComponentBag3.Get(entitiesInUse[i]);
+            }
+            _currentIndex = 0;
+        }
+
+        public void Reset()
+        {
+            _currentIndex = 0;
+        }
+
+        public bool Next(out ulong entity, out T1* component1, out T2* component2, out T3* component3)
+        {
+            entity = default;
+            component1 = default;
+            component2 = default;
+            component3 = default;
+
+            if (_currentIndex >= _entitiesInUse.Length)
+                return false;
+
+            entity = _entitiesInUse[_currentIndex];
+            component1 = _components1[_currentIndex];
+            component2 = _components2[_currentIndex];
+            component3 = _components3[_currentIndex];
             
             _currentIndex++;
 
