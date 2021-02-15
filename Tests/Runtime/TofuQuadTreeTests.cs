@@ -17,14 +17,6 @@ namespace Tests.Runtime
         {
             var quadTree = new TofuQuadTree<Circle>(0, 0, 64, 64);
 
-            // first some tests for the rect class
-            var rectA = new TofuQuadTree<Circle>.Rect(0, 0, 4, 3);
-            var rectB = new TofuQuadTree<Circle>.Rect(0, 5, 4, 3);
-            var rectC = new TofuQuadTree<Circle>.Rect(2, 1, 1, 1);
-            Assert.IsTrue(rectA.IsInBounds(rectC));
-            Assert.IsFalse(rectC.IsInBounds(rectA));
-            Assert.IsFalse(rectA.IsInBounds(rectB));
-
             var circleA = new Circle
             {
                 position = new Vector2(4, 4),
@@ -66,6 +58,18 @@ namespace Tests.Runtime
 
             var items = quadTree.Get(2, 2, 1, 1);
             Assert.IsTrue(items.Count == 1);
+        }
+
+        [Test]
+        public static void RectTest()
+        {
+            // some tests for the rect class
+            var rectA = new TofuQuadTree<Circle>.Rect(0, 0, 4, 3);
+            var rectB = new TofuQuadTree<Circle>.Rect(0, 5, 4, 3);
+            var rectC = new TofuQuadTree<Circle>.Rect(2, 1, 1, 1);
+            Assert.IsTrue(rectA.IsInBounds(rectC));
+            Assert.IsFalse(rectC.IsInBounds(rectA));
+            Assert.IsFalse(rectA.IsInBounds(rectB));
         }
     }
 }
