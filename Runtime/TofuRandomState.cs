@@ -11,19 +11,22 @@ namespace Tofunaut.TofuUnity
     [Serializable]
     public class TofuRandomState
     {
+        public int Seed => _seed;
+        public int Iteration => _iteration;
+        
         private int _seed;
-        private int _lastValue;
+        private int _iteration;
 
-        public TofuRandomState(int seed, int lastValue = 0)
+        public TofuRandomState(int seed, int iteration = 0)
         {
             _seed = seed;
-            _lastValue = lastValue;
+            _iteration = iteration;
         }
 
         public int Next()
         {
-            _lastValue = new Random(_seed + _lastValue).Next();
-            return _lastValue;
+            _iteration++;
+            return new Random(_seed + _iteration).Next();
         }
 
         public float NextFloat() => Range(0f, 1f);
