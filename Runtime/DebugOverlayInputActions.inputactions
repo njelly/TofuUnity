@@ -1,0 +1,44 @@
+{
+    "name": "DebugOverlayInputActions",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "44d1a558-ef21-4389-8aab-64ac4611a3f2",
+            "actions": [
+                {
+                    "name": "Toggle",
+                    "type": "Button",
+                    "id": "2932ada5-6698-46af-a04b-bb69f68a76d0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6fcbc867-7b27-4beb-9bbc-bc3d9ab9cda8",
+                    "path": "<Touchscreen>/touch4/tap",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Toggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "323721e2-becc-4eee-9050-832a635c135a",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Toggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
