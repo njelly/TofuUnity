@@ -1,8 +1,11 @@
 {
     "name": "Tofunaut.TofuUnity",
+    "rootNamespace": "",
     "references": [
         "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
