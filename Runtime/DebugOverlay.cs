@@ -93,6 +93,12 @@ namespace Tofunaut.TofuUnity
             var message = $"{DateTime.Now:HH:mm:ss}: {condition}";
             _logQueue.Enqueue((message, stacktrace, type));
 
+            if (type == LogType.Error || type == LogType.Exception)
+            {
+                _errorCount++;
+                SetErrorCountText();
+            }
+
             while (_logQueue.Count > maxLogs)
                 _logQueue.Dequeue();
         }
